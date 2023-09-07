@@ -2,8 +2,8 @@ name: Roo.cash e2e test
 
 on:
   schedule:
-    - cron: '5 8 * * *'
     - cron: '10 8 * * *'
+    - cron: '15 8 * * *'
   # push:
   #   branches:
   #     - master
@@ -24,8 +24,8 @@ jobs:
       - name: Set environment variables
         id: set_env
         run: |
-          BASE_REF="${{ github.event.pull_request.base.ref }}"
-          BASE_REF="${BASE_REF:-default_value}"
+          BASE_REF=${{ github.event.pull_request.base.ref }}
+          BASE_REF=${BASE_REF:-default_value}
           if [[ BASE_REF == 'release' || '${{ github.event.schedule }}' == '5 8 * * *' ]]; then
             echo "GOGO_ENV=staging" >> "$GITHUB_OUTPUT"
           elif [[ BASE_REF == 'master' || '${{ github.event.schedule }}' == '10 8 * * *' ]]; then
