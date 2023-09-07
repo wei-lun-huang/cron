@@ -2,8 +2,8 @@ name: Roo.cash e2e test
 
 on:
   schedule:
-    - cron: '12 8 * * *'
     - cron: '15 8 * * *'
+    - cron: '20 8 * * *'
   # push:
   #   branches:
   #     - master
@@ -26,9 +26,10 @@ jobs:
         run: |
           BASE_REF=${{ github.event.pull_request.base.ref }}
           BASE_REF=${BASE_REF:-default_value}
-          if [[ $BASE_REF == 'release' || ${{ github.event.schedule }} == '12 8 * * *' ]]; then
+          echo BASE_REF
+          if [[ ${{ BASE_REF }} == 'release' || '${{ github.event.schedule }}' == '15 8 * * *' ]]; then
             echo "GOGO_ENV=staging" >> "$GITHUB_OUTPUT"
-          elif [[ $BASE_REF == 'master' || ${{ github.event.schedule }} == '15 8 * * *' ]]; then
+          elif [[ ${{ BASE_REF }} == 'master' || '${{ github.event.schedule }}' == '20 8 * * *' ]]; then
             echo "GOGO_ENV=production" >> $GITHUB_OUTPUT
           fi
 
