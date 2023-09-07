@@ -24,9 +24,9 @@ jobs:
       - name: Set environment variables
         id: set_env
         run: |
-          if [[ github.event.pull_request.head.ref == 'release' || github.event.schedule == '0 13 * * *' ]]; then
+          if [[ github.event.pull_request.head.ref == 'release' ]]; then
             echo "GOGO_ENV=staging" >> "$GITHUB_OUTPUT"
-          elif [[ github.event.pull_request.head.ref == 'master' || github.event.schedule == '0 15 * * *' ]]; then
+          elif [[ github.event.pull_request.head.ref == 'master' ]]; then
             echo "GOGO_ENV=production" >> $GITHUB_OUTPUT
           fi
 
