@@ -1,0 +1,43 @@
+name: Roo.cash e2e test
+
+on:
+  schedule:
+    - cron: '0 13 * * *'
+    - cron: '0 15 * * *'
+  push:
+    branches:
+      - master
+      - release
+  pull_request:
+    branches:
+      - master
+      - release
+    types: [opened, synchronize]
+
+jobs:
+  set_envs:
+    runs-on: self-hosted
+    outputs:
+      GOGO_ENV: ${{ steps.set_env.outputs.GOGO_ENV }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set environment variables
+        id: set_env
+        run: |
+          if [[ $GITHUB_REF == 'refs/heads/release' || github.event.pull_request.head.ref == 'release' || github.event.schedule == '0 13 * * *' ]]; then
+            echo "GOGO_ENV=staging" >> "$GITHUB_OUTPUT"
+          elif [[ $GITHUB_REF == 'refs/heads/master' || github.event.pull_request.head.ref == 'master' || github.event.schedule == '0 15 * * *' ]]; then
+            echo "GOGO_ENV=production" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    runs-on: self-hosted
+    needs: set_envs
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build image
+        env:
+          GOGO_ENV: ${{needs.set_envs.outputs.GOGO_ENV}}
+        run: |
+          echo $GOGO_ENV
+
