@@ -43,5 +43,6 @@ jobs:
         env:
           GOGO_ENV: ${{needs.set_envs.outputs.GOGO_ENV}}
         run: |
+          echo ${{needs.set_envs.outputs.GOGO_ENV}}
           echo $GOGO_ENV
 
