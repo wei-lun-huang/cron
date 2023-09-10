@@ -1,9 +1,9 @@
 name: Roo.cash e2e test
 
 on:
-  schedule:
-    - cron: '20 8 * * *'
-    - cron: '25 8 * * *'
+  # schedule:
+  #   - cron: '20 8 * * *'
+  #   - cron: '25 8 * * *'
   # push:
   #   branches:
   #     - master
@@ -43,5 +43,6 @@ jobs:
         env:
           GOGO_ENV: ${{needs.set_envs.outputs.GOGO_ENV}}
         run: |
+          echo ${{needs.set_envs.outputs.GOGO_ENV}}
           echo $GOGO_ENV
 
