@@ -10,6 +10,7 @@ on:
   #     - release
   pull_request:
     branches:
+      - develop
       - release
       - master
     types: [opened, synchronize]
@@ -46,16 +47,16 @@ jobs:
           echo ${{needs.set_envs.outputs.GOGO_ENV}}
           echo $GOGO_ENV
 
-  # call_repo:
-  #   runs-on: self-hosted
-  #   steps:
-  #     - uses: actions/github-script@v6
-  #       with:
-  #         github-token: ${{ secrets.PERSONAL_TOKEN }}
-  #         script: |
-  #           await github.rest.actions.createWorkflowDispatch({
-  #           owner: 'wei-lun',
-  #           repo: 'https://github.com/wei-lun-huang/EC2/',
-  #           workflow_id: 'action.yml',
-  #           ref: 'release'
-  #           })
+  call_repo:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PERSONAL_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+            owner: 'wei-lun',
+            repo: 'https://github.com/wei-lun-huang/EC2/',
+            workflow_id: 'action.yml',
+            ref: 'release'
+            })
