@@ -48,13 +48,14 @@ jobs:
 
   call_repo:
     runs-on: self-hosted
-    uses: actions/github-script@v6
-    with:
-      github-token: ${{ secrets.PERSONAL_TOKEN }}
-      script: |
-        await github.rest.actions.createWorkflowDispatch({
-        owner: 'wei-lun',
-        repo: 'https://github.com/wei-lun-huang/EC2/',
-        workflow_id: 'action.yml',
-        ref: 'release'
-        })
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          # github-token: ${{ secrets.PERSONAL_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+            owner: 'wei-lun',
+            repo: 'https://github.com/wei-lun-huang/EC2/',
+            workflow_id: 'action.yml',
+            ref: 'release'
+            })
