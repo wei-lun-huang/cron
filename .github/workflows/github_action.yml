@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/github-script@v6
         with:
-          github-token: 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
+          github-token: ${{ secrets.ACCESS_TOKEN }}
           script: |
             await github.rest.actions.createWorkflowDispatch({
             owner: 'wei-lun-huang',
