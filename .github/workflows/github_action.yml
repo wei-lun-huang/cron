@@ -58,5 +58,5 @@ jobs:
             owner: 'wei-lun-huang',
             repo: 'EC2',
             workflow_id: 'action.yml',
-            ref: 'release'
+            GOGO_ENV: 'release'
             })
