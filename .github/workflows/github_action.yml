@@ -60,6 +60,6 @@ jobs:
               workflow_id: 'action.yml',
               ref: 'release',
               inputs: {
-                env: 'release',
+                env: 'staging',
               },
             })
