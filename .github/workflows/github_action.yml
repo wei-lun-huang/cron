@@ -57,6 +57,6 @@ jobs:
             await github.rest.actions.createWorkflowDispatch({
             owner: 'wei-lun-huang',
             repo: 'EC2',
-            workflow_id: 'action.yml',
+            workflow_id: 'actions.yml',
             ref: 'release'
             })
