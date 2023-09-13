@@ -63,9 +63,12 @@ jobs:
   #             workflow_id: 'action.yml',
   #             ref: 'release',
   #             inputs: {
-  #               env: ${{needs.set_envs.outputs.GOGO_ENV}},
+  #               env: ${{needs.set_envs.outputs.env}},
   #             },
   #           })
+   # inputs: {
+              #   env: ${{ steps.set_env.outputs.env }},
+              # },
   call_repo:
     runs-on: self-hosted
     steps:
@@ -96,9 +99,6 @@ jobs:
               repo: 'EC2',
               workflow_id: 'action.yml',
               ref: 'release',
-              # inputs: {
-              #   env: ${{ steps.set_env.outputs.env }},
-              # },
               inputs: {
                 env: release,
               },
