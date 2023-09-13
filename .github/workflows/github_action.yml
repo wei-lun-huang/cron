@@ -63,7 +63,7 @@ jobs:
           if [[ $BASE_REF == 'release' ]]; then
             echo "env=release" >> "$GITHUB_OUTPUT"
           elif [[ $BASE_REF == 'master' ]]; then
-            echo "env=production" >> "$GITHUB_OUTPUT"
+            echo "env=master" >> "$GITHUB_OUTPUT"
           else
             echo "env=develop" >> "$GITHUB_OUTPUT"
           fi
