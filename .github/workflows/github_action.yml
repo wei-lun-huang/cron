@@ -96,7 +96,10 @@ jobs:
               repo: 'EC2',
               workflow_id: 'action.yml',
               ref: 'release',
+              # inputs: {
+              #   env: ${{ steps.set_env.outputs.env }},
+              # },
               inputs: {
-                env: ${{ steps.set_env.outputs.env }},
+                env: release,
               },
             })
