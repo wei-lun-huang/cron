@@ -49,6 +49,7 @@ jobs:
 
   call_repo:
     runs-on: self-hosted
+    needs: set_envs
     steps:
       - uses: actions/github-script@v6
         with:
@@ -60,6 +61,6 @@ jobs:
               workflow_id: 'action.yml',
               ref: 'release',
               inputs: {
-                env: 'staging',
+                env: ${{needs.set_envs.outputs.GOGO_ENV}},
               },
             })
