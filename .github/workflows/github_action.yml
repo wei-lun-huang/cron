@@ -47,30 +47,9 @@ jobs:
           echo ${{needs.set_envs.outputs.GOGO_ENV}}
           echo $GOGO_ENV
 
-  # call_repo:
-  #   runs-on: self-hosted
-  #   needs: set_envs
-  #   steps:
-  #     - name: call workflow
-  #       if: github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'release'
-  #       uses: actions/github-script@v6
-  #       with:
-  #         github-token: ${{ secrets.ACCESS_TOKEN }}
-  #         script: |
-  #           await github.rest.actions.createWorkflowDispatch({
-  #             owner: 'wei-lun-huang',
-  #             repo: 'EC2',
-  #             workflow_id: 'action.yml',
-  #             ref: 'release',
-  #             inputs: {
-  #               env: ${{needs.set_envs.outputs.env}},
-  #             },
-  #           })
-   # inputs: {
-              #   env: ${{ steps.set_env.outputs.env }},
-              # },
   call_repo:
     runs-on: self-hosted
+    if: github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'release'
     steps:
       - name: Check Pull Request Base Branch
         id: branch_check
