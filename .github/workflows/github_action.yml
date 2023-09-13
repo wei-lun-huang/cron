@@ -76,11 +76,6 @@ jobs:
       - name: Determine Env Variable
         id: set_env
         run: |
-          # if [[ "${{ github.event.pull_request.base.ref }}" == "master" || "${{ github.event.pull_request.base.ref }}" == "release" ]]; then
-          #   echo "::set-output name=env::${{ github.event.pull_request.base.ref }}"
-          # else
-          #   echo "::set-output name=env::staging"
-          # fi
           BASE_REF=${{ github.event.pull_request.base.ref }}
           BASE_REF=${BASE_REF:-default_value}
           if [[ $BASE_REF == 'release' ]]; then
