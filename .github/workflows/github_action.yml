@@ -61,7 +61,7 @@ jobs:
           BASE_REF=${{ github.event.pull_request.base.ref }}
           BASE_REF=${BASE_REF:-default_value}
           if [[ $BASE_REF == 'release' ]]; then
-            echo "env=staging" >> "$GITHUB_OUTPUT"
+            echo "env=release" >> "$GITHUB_OUTPUT"
           elif [[ $BASE_REF == 'master' ]]; then
             echo "env=production" >> "$GITHUB_OUTPUT"
           else
