@@ -10,6 +10,7 @@ on:
   #     - release
   pull_request:
     branches:
+      - develop
       - release
       - master
     types: [opened, synchronize]
@@ -31,7 +32,7 @@ jobs:
           if [[ $BASE_REF == 'release' || '${{ github.event.schedule }}' == '20 8 * * *' ]]; then
             echo "GOGO_ENV=staging" >> "$GITHUB_OUTPUT"
           elif [[ $BASE_REF == 'master' || '${{ github.event.schedule }}' == '25 8 * * *' ]]; then
-            echo "GOGO_ENV=production" >> $GITHUB_OUTPUT
+            echo "GOGO_ENV=production" >> "$GITHUB_OUTPUT"
           fi
 
   build:
@@ -46,3 +47,38 @@ jobs:
           echo ${{needs.set_envs.outputs.GOGO_ENV}}
           echo $GOGO_ENV
 
+  call_repo:
+    runs-on: self-hosted
+    if: github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'release'
+    steps:
+      - name: Check Pull Request Base Branch
+        id: branch_check
+        run: echo "Base branch is ${{ github.event.pull_request.base.ref }}"
+
+      - name: Determine Env Variable
+        id: set_env
+        run: |
+          BASE_REF=${{ github.event.pull_request.base.ref }}
+          BASE_REF=${BASE_REF:-default_value}
+          if [[ $BASE_REF == 'release' ]]; then
+            echo "env=staging" >> "$GITHUB_OUTPUT"
+          elif [[ $BASE_REF == 'master' ]]; then
+            echo "env=production" >> "$GITHUB_OUTPUT"
+          else
+            echo "env=develop" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Call Workflow
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.ACCESS_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'wei-lun-huang',
+              repo: 'EC2',
+              workflow_id: 'action.yml',
+              ref: 'release',
+              inputs: {
+                env: '${{ steps.set_env.outputs.env }}',
+              },
+            })
