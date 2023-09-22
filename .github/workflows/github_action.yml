@@ -4,10 +4,10 @@ on:
   # schedule:
   #   - cron: '20 8 * * *'
   #   - cron: '25 8 * * *'
-  # push:
-  #   branches:
-  #     - master
-  #     - release
+  push:
+    branches:
+      - master
+      # - release
   pull_request:
     branches:
       - develop
@@ -16,86 +16,113 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  set_envs:
-    runs-on: self-hosted
-    outputs:
-      GOGO_ENV: ${{ steps.set_env.outputs.GOGO_ENV }}
+  # set_envs:
+  #   runs-on: self-hosted
+  #   outputs:
+  #     GOGO_ENV: ${{ steps.set_env.outputs.GOGO_ENV }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Set environment variables
+  #       id: set_env
+  #       run: |
+  #         BASE_REF=${{ github.event.pull_request.base.ref }}
+  #         BASE_REF=${BASE_REF:-default_value}
+  #         echo BASE_REF
+  #         echo $BASE_REF
+  #         if [[ $BASE_REF == 'release' || '${{ github.event.schedule }}' == '20 8 * * *' ]]; then
+  #           echo "GOGO_ENV=staging" >> "$GITHUB_OUTPUT"
+  #         elif [[ $BASE_REF == 'master' || '${{ github.event.schedule }}' == '25 8 * * *' ]]; then
+  #           echo "GOGO_ENV=production" >> "$GITHUB_OUTPUT"
+  #         fi
+
+  # build:
+  #   runs-on: self-hosted
+  #   needs: set_envs
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Build image
+  #       env:
+  #         GOGO_ENV: ${{needs.set_envs.outputs.GOGO_ENV}}
+  #       run: |
+  #         echo ${{needs.set_envs.outputs.GOGO_ENV}}
+  #         echo $GOGO_ENV
+
+  # call_repo:
+  #   runs-on: self-hosted
+  #   if: github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'release'
+  #   steps:
+  #     - name: Check Pull Request Base Branch
+  #       id: branch_check
+  #       run: echo "Base branch is ${{ github.event.pull_request.base.ref }}"
+
+  #     - name: Determine Env Variable
+  #       id: set_env
+  #       run: |
+  #         BASE_REF=${{ github.event.pull_request.base.ref }}
+  #         BASE_REF=${BASE_REF:-default_value}
+  #         if [[ $BASE_REF == 'release' ]]; then
+  #           echo "env=release" >> "$GITHUB_OUTPUT"
+  #         elif [[ $BASE_REF == 'master' ]]; then
+  #           echo "env=master" >> "$GITHUB_OUTPUT"
+  #         else
+  #           echo "env=develop" >> "$GITHUB_OUTPUT"
+  #         fi
+
+  #     # - name: Call Workflow
+  #     #   uses: actions/github-script@v6
+  #     #   with:
+  #     #     github-token: ${{ secrets.ACCESS_TOKEN }}
+  #     #     script: |
+  #     #       await github.rest.actions.createWorkflowDispatch({
+  #     #         owner: 'wei-lun-huang',
+  #     #         repo: 'EC2',
+  #     #         workflow_id: 'action.yml',
+  #     #         ref: 'release',
+  #     #         inputs: {
+  #     #           env: '${{ steps.set_env.outputs.env }}',
+  #     #         },
+  #     #       })
+
+  #     - name: Call repo
+  #       uses: actions/github-script@v6
+  #       with:
+  #         github-token: ${{ secrets.ACCESS_TOKEN }}
+  #         script: |
+  #           await github.rest.repos.createDispatchEvent({
+  #             owner: 'wei-lun-huang',
+  #             repo: 'EC2',
+  #             event_type: 'release-test',
+  #             client_payload: {
+  #               branch: '${{ steps.set_env.outputs.env }}',
+  #             },
+  #           })
+  tag:
+    name: AutoTag
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master'
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set environment variables
-        id: set_env
-        run: |
-          BASE_REF=${{ github.event.pull_request.base.ref }}
-          BASE_REF=${BASE_REF:-default_value}
-          echo BASE_REF
-          echo $BASE_REF
-          if [[ $BASE_REF == 'release' || '${{ github.event.schedule }}' == '20 8 * * *' ]]; then
-            echo "GOGO_ENV=staging" >> "$GITHUB_OUTPUT"
-          elif [[ $BASE_REF == 'master' || '${{ github.event.schedule }}' == '25 8 * * *' ]]; then
-            echo "GOGO_ENV=production" >> "$GITHUB_OUTPUT"
-          fi
-
-  build:
-    runs-on: self-hosted
-    needs: set_envs
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build image
-        env:
-          GOGO_ENV: ${{needs.set_envs.outputs.GOGO_ENV}}
-        run: |
-          echo ${{needs.set_envs.outputs.GOGO_ENV}}
-          echo $GOGO_ENV
-
-  call_repo:
-    runs-on: self-hosted
-    if: github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'release'
-    steps:
-      - name: Check Pull Request Base Branch
-        id: branch_check
-        run: echo "Base branch is ${{ github.event.pull_request.base.ref }}"
-
-      - name: Determine Env Variable
-        id: set_env
-        run: |
-          BASE_REF=${{ github.event.pull_request.base.ref }}
-          BASE_REF=${BASE_REF:-default_value}
-          if [[ $BASE_REF == 'release' ]]; then
-            echo "env=release" >> "$GITHUB_OUTPUT"
-          elif [[ $BASE_REF == 'master' ]]; then
-            echo "env=master" >> "$GITHUB_OUTPUT"
-          else
-            echo "env=develop" >> "$GITHUB_OUTPUT"
-          fi
-
-      # - name: Call Workflow
-      #   uses: actions/github-script@v6
-      #   with:
-      #     github-token: ${{ secrets.ACCESS_TOKEN }}
-      #     script: |
-      #       await github.rest.actions.createWorkflowDispatch({
-      #         owner: 'wei-lun-huang',
-      #         repo: 'EC2',
-      #         workflow_id: 'action.yml',
-      #         ref: 'release',
-      #         inputs: {
-      #           env: '${{ steps.set_env.outputs.env }}',
-      #         },
-      #       })
-
-      - name: Call repo
-        uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.ACCESS_TOKEN }}
-          script: |
-            await github.rest.repos.createDispatchEvent({
-              owner: 'wei-lun-huang',
-              repo: 'EC2',
-              event_type: 'release-test',
-              client_payload: {
-                branch: '${{ steps.set_env.outputs.env }}',
-              },
-            })
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set Git Config
+        run: |
+          git config --global user.email "macroupus@gogolook.com"
+          git config --global user.name "macroupus"
+      - name: Create Git Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # pr_title="${{ github.event.pull_request.title }}"
+          # if ! [[ $pr_title =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          #   echo "Error: Invalid PR title format"
+          #   exit 1
+          # else
+          #   echo "PR title format is valid"
+          # fi
+          # pr_body=$(echo "${{ github.event.pull_request.body }}" | grep -oP 'RC-\d+')
+          # git tag -a "$pr_title" -m "$pr_body"
+          git tag -a "pr_title" -m "pr_body"
+          git push origin --tags
 
 # lanch and close ec2
 
@@ -103,7 +130,7 @@ jobs:
 # curl -L \
 #   -X POST \
 #   -H "Accept: application/vnd.github+json" \
-#   -H "Authorization: Bearer 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" \
+#   -H "Authorization: Bearer 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" \
 #   -H "X-GitHub-Api-Version: 2022-11-28" \
 #   https://api.github.com/repos/wei-lun-huang/EC2/dispatches \
 #   -d '{"event_type":"release-test","client_payload":{"branch":"release"}}'
@@ -111,15 +138,21 @@ jobs:
 # curl -L \
 #   -X POST \
 #   -H "Accept: application/vnd.github+json" \
-#   -H "Authorization: Bearer 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" \
-#   -H "X-GitHub-Api-Version: 2022-11-28" \
+#   -H "Authorization: Bearer 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" \
 #   https://api.github.com/repos/wei-lun-huang/EC2/dispatches \
-#   -d '{"event_type":"master-test","client_payload":{"branch":"master"}}'
+#   -d '{"event_type":"release-test","client_payload":{"branch":"release"}}'
 
 # workflow_dispatch
 # curl \
 #   -X POST \
 #   -H "Accept: application/vnd.github.v3+json" \
-#   -H "Authorization: Bearer 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" \
+#   -H "Authorization: Bearer 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" \
 #   https://api.github.com/repos/wei-lun-huang/EC2/actions/workflows/action.yml/dispatches \
 #   -d '{"ref":"refs/heads/master", "inputs":{"env":"master"}}'
+
+# curl -L \
+#   -X POST \
+#   -H "Accept: application/vnd.github+json" \
+#   -H "Authorization: Bearer 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" \
+#   https://api.github.com/repos/Gogolook-Inc/Kangaroo/dispatches?q=weilun.huang:MYUSERNAME \
+#   -d '{"event_type":"release-test","client_payload":{"branch":"release"}}'
