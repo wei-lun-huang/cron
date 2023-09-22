@@ -13,7 +13,7 @@ on:
       - develop
       - release
       - master
-    types: [opened, synchronize]
+    types: [opened, synchronize, closed]
 
 jobs:
   # set_envs:
@@ -112,16 +112,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # pr_title="${{ github.event.pull_request.title }}"
-          # if ! [[ $pr_title =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          #   echo "Error: Invalid PR title format"
-          #   exit 1
-          # else
-          #   echo "PR title format is valid"
-          # fi
-          # pr_body=$(echo "${{ github.event.pull_request.body }}" | grep -oP 'RC-\d+')
-          # git tag -a "$pr_title" -m "$pr_body"
-          git tag -a "pr_title" -m "pr_body"
+          pr_title="${{ github.event.pull_request.title }}"
+          if ! [[ $pr_title =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Invalid PR title format"
+            exit 1
+          else
+            echo "PR title format is valid"
+          fi
+          pr_body=$(echo "${{ github.event.pull_request.body }}" | grep -oP 'RC-\d+')
+          git tag -a "$pr_title" -m "$pr_body"
           git push origin --tags
 
 # lanch and close ec2
