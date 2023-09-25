@@ -109,8 +109,8 @@ jobs:
           git config --global user.email "macroupus@gogolook.com"
           git config --global user.name "macroupus"
       - name: Create Git Tag
-        # env:
-        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pr_title="${{ github.event.pull_request.title }}"
           if ! [[ $pr_title =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
